@@ -52,10 +52,17 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 
   // Get the session from the server using the getServerSession wrapper function
   const session = await getServerAuthSession({ req, res });
-
-  return createInnerTRPCContext({
-    session,
-  });
+  //was original return
+  // return createInnerTRPCContext({
+  //   session,
+  // });
+  const token = req.headers.authorization?.split(' ')[1]
+  return {
+    req,
+    res,
+    prisma,
+    token,
+  }
 };
 
 /**
@@ -98,15 +105,21 @@ export const publicProcedure = t.procedure;
 
 /** Reusable middleware that enforces users are logged in before running the procedure. */
 const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
-  }
-  return next({
-    ctx: {
-      // infers the `session` as non-nullable
-      session: { ...ctx.session, user: ctx.session.user },
-    },
-  });
+  // if (!ctx.session || !ctx.session.user) {
+  //   throw new TRPCError({ code: "UNAUTHORIZED" });
+  // }
+  // return next({
+  //   ctx: {
+  //     // infers the `session` as non-nullable
+  //     session: { ...ctx.session, user: ctx.session.user },
+  //   },
+  // });
+    const { req, res} = ctx
+
+    const token  =  req.headers.authorization?.split(' ')[1]
+    console.log(token)
+    if(token === undefined) throw new TRPCError({ code: 'UNAUTHORIZED'})
+    return next()
 });
 
 /**
