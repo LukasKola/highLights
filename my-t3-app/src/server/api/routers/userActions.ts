@@ -1,4 +1,4 @@
-import { create } from "domain";
+import { User } from "./login";
 import { z } from "zod";
 
 
@@ -12,8 +12,12 @@ export const userActions = createTRPCRouter({
     addPlay: protectedProcedure
     .mutation(({ctx}) => {
         return {
-            play: 'ctx.token'
+            play: ctx.user.someUserdata as User
         }
-    })
+    }),
+    userInfo: protectedProcedure
+        .query(({ ctx }) => {
+            return ctx.user.someUserdata as User
+        })
 
 })

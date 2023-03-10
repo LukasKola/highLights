@@ -19,6 +19,11 @@ import { type Session } from "next-auth";
 
 import { getServerAuthSession } from "~/server/auth";
 import { prisma } from "~/server/db";
+import { jwtVerify } from "jose";
+
+const secret = new TextEncoder().encode(
+  'cc7e0d44fd473002f1c42167459001140ec6389b7353f8088f4d9a95f2f596f2',
+)
 
 type CreateContextOptions = {
   session: Session | null;
@@ -104,7 +109,7 @@ export const createTRPCRouter = t.router;
 export const publicProcedure = t.procedure;
 
 /** Reusable middleware that enforces users are logged in before running the procedure. */
-const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
+const enforceUserIsAuthed = t.middleware( async({ ctx, next }) => {
   // if (!ctx.session || !ctx.session.user) {
   //   throw new TRPCError({ code: "UNAUTHORIZED" });
   // }
@@ -117,9 +122,17 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
     const { req, res} = ctx
 
     const token  =  req.headers.authorization?.split(' ')[1]
-    console.log(token)
-    if(token === undefined) throw new TRPCError({ code: 'UNAUTHORIZED'})
-    return next()
+
+    if(token === typeof(undefined)) throw new TRPCError({ code: 'UNAUTHORIZED'})
+
+    const { payload, protectedHeader} = await jwtVerify(token!, secret, {
+      issuer: 'issuer',
+      audience: 'audience'
+    })
+  
+    return next({
+      ctx: {...ctx, user: payload}
+    })
 });
 
 /**
