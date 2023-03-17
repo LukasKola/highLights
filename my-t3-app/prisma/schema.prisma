@@ -41,15 +41,16 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String      @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?     @unique
   emailVerified DateTime?
   image         String?
   password      String?
   token         String?
   accounts      Account[]
   sessions      Session[]
+  highlights    HighLight[]
 }
 
 model VerificationToken {
@@ -58,6 +59,32 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model HighLight {
+  id        String    @unique @default(cuid())
+  userName  String
+  userId    String
+  url       String?
+  content   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  likes     String?
+  dislikes  String?
+  comments  Comment[]
+  user      User      @relation(fields: [userId], references: [id])
+}
+
+model Comment {
+  id          String    @unique @default(cuid())
+  userName    String
+  userId      String
+  highlightID String
+  comment     String
+  comentedAt  DateTime  @default(now())
+  likes       Int       @default(0)
+  dislikes    Int       @default(0)
+  highlight   HighLight @relation(fields: [highlightID], references: [id], onDelete: Cascade)
 }
 
 model BodyPart {

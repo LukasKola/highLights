@@ -15,8 +15,7 @@ const login = () => {
                 router.push('/homepage')
     },
         onError: ( { message }) => {
-            if(message === 'UNAUTHORIZED')
-            setMessage('wrong user informations')
+            setMessage(message)
         }
     })
     const { mutate: secureAction, data } = api.authRouter.secureActions.useMutation()
@@ -44,7 +43,9 @@ const login = () => {
                <button type="submit" >log in</button>
             </form>
             <div>
-                { message && <p>{message}</p>}
+                { 
+                    message && <p>{message}</p>
+                }
             </div>
             <div>
                 <button type="button" onClick={() => secureAction()} >Secure action</button>
