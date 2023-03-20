@@ -15,17 +15,6 @@ const secret = new TextEncoder().encode(
 
   const alg = 'HS256'
 
-// export type User = {
-//     id: string,
-//     name: string,
-//     email: string,
-//     emailVerified: string,
-//     image: string,
-//     password: string,
-//     token: string,
-    
-// }
-
 
 export const hashPass = (pass: string) => {
     return crypto.createHash('sha512').update(pass).digest('hex')
