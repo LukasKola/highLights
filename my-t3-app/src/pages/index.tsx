@@ -19,9 +19,9 @@ const Home: NextPage = () => {
         <h1 className="text-4xl m-2">Welcome to HighLights</h1>
         <p>Share with other players your best gaming moments</p>
         <p>Please Log in here:</p>
-        <Link className="border border-black rounded hover:bg-green-500 p-1" href={"/login"}>LogIn</Link>
+        <Link className="border border-black rounded bg-gray-200 hover:bg-black hover:text-white p-1" href={"/login"}>LogIn</Link>
         <p>If u dont have an account create one here:</p>
-        <Link className="border border-black rounded hover:bg-blue-500 p-1" href={'/registration'}>Register</Link>
+        <Link className="border border-black rounded bg-gray-200 hover:bg-black hover:text-white p-1" href={'/registration'}>Register</Link>
       </div>
     </>
   );

@@ -1,17 +1,23 @@
 import Link from "next/link"
 import { SyntheticEvent, useEffect, useRef, useState } from "react"
+import Footer from "~/components/Footer"
+import Navbar from "~/components/Navabar"
 import { api } from "~/utils/api"
 
 
 const homePage = () => {
-    const { mutate: secureAct, data} = api.authRouter.secureActions.useMutation()
+
     const userData = api.secureActions.userInfo.useQuery()
     const highLight = useRef<HTMLFormElement>(null)
     const highlights = api.secureActions.userHighLights.useQuery()
     const [refresh, setRefresh] = useState<boolean>(false)
+    const content = highLight.current?.childNodes[0]?.childNodes[1] as HTMLTextAreaElement
+    const url = highLight.current?.childNodes[1]?.childNodes[1] as HTMLInputElement
     const { mutate: addHighLight } = api.secureActions.addPlay.useMutation({
         onSuccess:() => {
             setRefresh(!refresh)
+            content.value = ''
+            url.value= ''
         }
     })
     const { mutate: like } = api.secureActions.liking.useMutation({
@@ -19,31 +25,28 @@ const homePage = () => {
             setRefresh(!refresh)
         }
     })
-    
+    const { mutate: deleteHighLight } = api.secureActions.deleteHighLight.useMutation({
+        onSuccess:() => {
+            setRefresh(!refresh)
+        }
+    })
     useEffect(() => {
         highlights.refetch()
     },[refresh])
 
 const handleAdd = (e: SyntheticEvent) => {
     e.preventDefault()
-    const content = highLight.current?.childNodes[0]?.childNodes[1] as HTMLTextAreaElement
-    const url = highLight.current?.childNodes[1]?.childNodes[1] as HTMLInputElement
-    
     addHighLight({ content: content.value, url: url.value })
     
-    content.value = ''
-    url.value= ''
 }
 
     const rev = highlights.data?.highlights.map(e => e).reverse() || []
     return ( 
         <>
+            <Navbar/>
             <p>this is user page</p>
             <p>Welcome {userData.data?.name}</p>
-            <button onClick={() => secureAct()} >scure action</button>
-        
-                { data && <p>secure data: {data.name}</p> }
-
+           
             <Link href={'/test'} >Login page</Link>
             <div className="border border-black w-1/3 rounded-xl p-1">
                 <p className="text-2xl" >New highlight:</p>
@@ -86,10 +89,12 @@ const handleAdd = (e: SyntheticEvent) => {
                                         >
                                         dislikes: {h.dislikes?.split(',').length! - 1 || 0 }
                                     </p>
+                                    <button type="button" className=" m-1 p-1 border border-black rounded-xl bg-gray-200 hover:bg-black hover:text-white" onClick={() => deleteHighLight({ highlightID: h.id})} >Delete</button>
                                 </div>
                             )
                         })
                     }
+            <Footer/>
         </>
     )
 }

@@ -166,4 +166,16 @@ export const userActions = createTRPCRouter({
                     : dislikedFun(input.highlight, user.name!, dislikes)
             }
         }),
+        deleteHighLight: protectedProcedure
+        .input(z.object({
+            highlightID: z.string()
+        }))
+        .mutation( async({ ctx, input }) => {
+            const deleted = await ctx.prisma.highLight.delete({
+                where: {
+                    id: input.highlightID
+                }
+            })
+            return deleted
+        })  
 })
